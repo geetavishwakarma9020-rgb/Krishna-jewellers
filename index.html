@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#6d1420">
+<title>Krishna Jewellers</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" type="image/png" href="icons/favicon-64.png">
+<link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Krishna">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LOGIN -->
+<section id="login" class="login">
+  <div class="login-card">
+    <svg class="diya" viewBox="0 0 120 110" aria-hidden="true">
+      <defs>
+        <radialGradient id="glow" cx="50%" cy="40%" r="50%"><stop offset="0" stop-color="#ffd966" stop-opacity=".8"/><stop offset="1" stop-color="#ffd966" stop-opacity="0"/></radialGradient>
+      </defs>
+      <circle cx="60" cy="38" r="36" fill="url(#glow)" class="glow"/>
+      <path class="flame" d="M60 8c10 14 16 22 16 32a16 16 0 0 1-32 0c0-10 6-18 16-32z" fill="#ff9a1f"/>
+      <path class="flame2" d="M60 22c5 8 8 13 8 19a8 8 0 0 1-16 0c0-6 3-11 8-19z" fill="#ffe08a"/>
+      <path d="M14 66h92c0 22-20 36-46 36S14 88 14 66z" fill="#6d1420" stroke="#c9a227" stroke-width="3"/>
+      <path d="M24 74h72" stroke="#c9a227" stroke-width="2" stroke-dasharray="2 6" stroke-linecap="round"/>
+    </svg>
+    <h1>Krishna Jewellers</h1>
+    <p class="muted">Customer &amp; Stock Book</p>
+    <input id="pw" type="password" placeholder="Password" autocomplete="off" aria-label="Password">
+    <button id="loginBtn" class="btn primary big">Open</button>
+    <p id="loginErr" class="err" role="alert"></p>
+  </div>
+</section>
+
+<!-- APP -->
+<div id="app" hidden>
+  <div class="sticky">
+    <header class="topbar">
+      <div class="brand">
+        <span class="logo">KJ</span>
+        <span><b>Krishna Jewellers</b><small>Customer &amp; Stock Book</small></span>
+      </div>
+      <button id="lockBtn" class="iconbtn" aria-label="Log out">
+        <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+      </button>
+    </header>
+    <button id="warnBar" class="warnbar" hidden></button>
+  </div>
+
+  <main>
+    <!-- HOME -->
+    <section id="home" class="screen">
+      <div class="hero card shine">
+        <small id="heroDate"></small>
+        <h2>Namaste</h2>
+        <div class="hero-amt"><span id="stToday">₹0</span><small>Today's sales</small></div>
+        <div class="hero-orn" aria-hidden="true"></div>
+      </div>
+
+      <div id="backupNudge" class="nudge" hidden>
+        <span>Backup lene ka time ho gaya hai.</span>
+        <button class="btn small" data-go="admin">Backup</button>
+      </div>
+
+      <div class="stats">
+        <div class="stat card shine"><span id="stTotal">₹0</span><small>Total sales</small></div>
+        <div class="stat card shine due"><span id="stDue">₹0</span><small>Balance due</small></div>
+        <div class="stat card shine"><span id="stCount">0</span><small>Customers</small></div>
+        <div class="stat card shine"><span id="stStock">0</span><small>Pieces in stock</small></div>
+      </div>
+
+      <div class="actions">
+        <button class="tile" data-go="add"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg><b>New Sale</b><small>Customer + bill</small></button>
+        <button class="tile" data-act="addProduct"><svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20"/></svg><b>Add Product</b><small>Put in stock</small></button>
+      </div>
+
+      <div id="homeLowWrap" hidden>
+        <h3>Stock alerts</h3>
+        <div id="homeLow" class="list"></div>
+      </div>
+
+      <h3>Recent customers</h3>
+      <div id="recent" class="list"></div>
+    </section>
+
+    <!-- NEW SALE -->
+    <section id="add" class="screen" hidden>
+      <h2>New Sale</h2>
+      <div id="noProd" class="card empty-card" hidden>
+        <p><b>Stock mein abhi koi product nahi hai.</b><br>Pehle product add karo, phir sale bana sakte ho.</p>
+        <button class="btn primary" data-act="addProduct">+ Add Product</button>
+      </div>
+
+      <div class="card">
+        <label>Customer name
+          <input id="fName" placeholder="Full name" autocomplete="off">
+        </label>
+        <label>Phone number
+          <input id="fPhone" type="tel" inputmode="numeric" placeholder="10 digit mobile number" autocomplete="off">
+        </label>
+      </div>
+
+      <div id="lines"></div>
+      <button type="button" id="addLine" class="btn big dashed">+ Add another item</button>
+
+      <div class="card bill">
+        <div class="bill-row"><span>Total amount</span><b id="sumTotal">₹0.00</b></div>
+        <label>Paid now (₹)
+          <input id="fPaid" type="number" step="0.01" min="0" inputmode="decimal" placeholder="0">
+        </label>
+        <div class="quick">
+          <button type="button" class="chip" data-paid="full">Full payment</button>
+          <button type="button" class="chip" data-paid="half">Half</button>
+          <button type="button" class="chip" data-paid="zero">Nothing</button>
+        </div>
+        <div id="balBox" class="balbox"><span id="balLabel">Balance</span><b id="sumBal">₹0.00</b></div>
+      </div>
+
+      <button id="saveBtn" class="btn primary big">Save &amp; generate receipt</button>
+    </section>
+
+    <!-- RECORDS -->
+    <section id="book" class="screen" hidden>
+      <h2>Record Book</h2>
+      <input id="search" class="search" placeholder="Search name, phone or product" aria-label="Search records">
+      <div class="chips" id="bookChips">
+        <button class="chip on" data-filter="all">All</button>
+        <button class="chip" data-filter="due">Balance due</button>
+      </div>
+      <div id="bookList" class="list"></div>
+    </section>
+
+    <!-- DETAIL -->
+    <section id="detail" class="screen" hidden>
+      <button class="link" data-go="book">‹ Back to Record Book</button>
+      <div id="detailBody" class="card"></div>
+      <button id="detailPay" class="btn primary big">Receive payment</button>
+      <button id="detailReceipt" class="btn big">View receipt</button>
+      <button id="detailDelete" class="btn danger big">Delete record</button>
+    </section>
+
+    <!-- RECEIPT -->
+    <section id="receipt" class="screen" hidden>
+      <div class="noprint receipt-actions">
+        <button class="btn" id="rcBack">‹ Back</button>
+        <button class="btn primary" id="rcPrint">Print / Save PDF</button>
+        <button class="btn" id="rcDownload">Download</button>
+        <button class="btn" id="rcWhats">WhatsApp</button>
+      </div>
+      <div id="receiptPaper"></div>
+    </section>
+
+    <!-- STOCK -->
+    <section id="stock" class="screen" hidden>
+      <div class="head-row">
+        <h2>Stock</h2>
+        <button class="btn primary small" data-act="addProduct">+ Add Product</button>
+      </div>
+      <input id="stockSearch" class="search" placeholder="Search product" aria-label="Search product">
+      <div id="stockList" class="list"></div>
+    </section>
+
+    <!-- ADMIN -->
+    <section id="admin" class="screen" hidden>
+      <h2>Admin</h2>
+
+      <div class="card">
+        <h3>Shop</h3>
+        <p class="shopfixed"><b>Krishna Jewellers</b><br>Waghobanagar, Kalwa East, Thane — Near Parsik Tunnel</p>
+        <label>Phone number (shown on receipt)
+          <input id="sPhone" type="tel" inputmode="tel" placeholder="e.g. 98765 43210">
+        </label>
+        <button id="savePhone" class="btn primary">Save phone number</button>
+      </div>
+
+      <div class="card">
+        <h3>Backup</h3>
+        <p class="muted">Customers, stock aur receipts ka poora data ek file mein save hota hai. File WhatsApp ya email par apne aap ko bhej do.</p>
+        <p class="muted" id="lastBackup"></p>
+        <button id="backupBtn" class="btn primary">Download backup</button>
+        <label class="filebtn">Restore from backup
+          <input id="restoreFile" type="file" accept=".json,application/json" hidden>
+        </label>
+      </div>
+
+      <div class="card">
+        <h3>Change password</h3>
+        <label>Current password <input id="pwOld" type="password" autocomplete="off"></label>
+        <label>New password <input id="pwNew" type="password" autocomplete="off"></label>
+        <button id="pwSave" class="btn primary">Change password</button>
+      </div>
+
+      <div class="card">
+        <h3>Danger zone</h3>
+        <button id="wipeRecords" class="btn danger">Delete all customer records</button>
+        <button id="wipeAll" class="btn danger">Delete everything (records + stock)</button>
+        <button id="logoutBtn" class="btn">Log out</button>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tabbar" aria-label="Main">
+    <button class="tab" data-go="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-8 9 8v9a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"/></svg><span>Home</span></button>
+    <button class="tab" data-go="book"><svg viewBox="0 0 24 24"><path d="M4 4h12a4 4 0 0 1 4 4v12H8a4 4 0 0 1-4-4z"/><path d="M8 4v16"/></svg><span>Records</span></button>
+    <button class="tab fab" data-go="add" aria-label="New sale"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+    <button class="tab" data-go="stock"><svg viewBox="0 0 24 24"><path d="M6 3h12l4 6-10 12L2 9z"/><path d="M2 9h20M9 3l3 6 3-6M12 21L9 9M12 21l3-12"/></svg><span>Stock</span><i id="tabDot" class="dot" hidden></i></button>
+    <button class="tab" data-go="admin"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg><span>Admin</span></button>
+  </nav>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal" hidden>
+  <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+    <h3 id="mTitle"></h3>
+    <div id="mBody"></div>
+    <div class="mbtns">
+      <button class="btn" id="mCancel">Cancel</button>
+      <button class="btn primary" id="mOk">Save</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+<script src="app.js"></script>
+</body>
+</html>
